@@ -2,30 +2,28 @@
 //This method prints some of the variables to the serial monitor for debugging
 //===========================================================================
 void printData(){
-// Serial.print("Home: (");
-// Serial.print(qRef1);Serial.print(" "); Serial.print(qRef2);Serial.print(" ");Serial.print(qRef3);Serial.print(" ");Serial.print(qRef4);
-// Serial.print(")"); 
+ Serial.print("Home: (");
+ Serial.print(qRef1);Serial.print(" "); Serial.print(qRef2);Serial.print(" ");Serial.print(qRef3);Serial.print(" ");Serial.print(qRef4);
+ Serial.print(")"); 
  
-// Serial.print("    ");Serial.print("Measured:(");
-// Serial.print(qMeas1);Serial.print(" "); Serial.print(qMeas2);Serial.print(" ");Serial.print(qMeas3);Serial.print(" ");Serial.print(qMeas4);  
-// Serial.print(")"); 
+ Serial.print("    ");Serial.print("Measured:(");
+ Serial.print(qMeas1);Serial.print(" "); Serial.print(qMeas2);Serial.print(" ");Serial.print(qMeas3);Serial.print(" ");Serial.print(qMeas4);  
+ Serial.print(")"); 
  
 // Serial.print("    ");Serial.print("Inertial Error:(");
 // Serial.print(qErr1);Serial.print(" "); Serial.print(qErr2);Serial.print(" ");Serial.print(qErr3);Serial.print(" ");Serial.print(qErr4); 
 // Serial.print(")");
 
-// Serial.print("    ");Serial.print("Home Error:(");
+ Serial.print("    ");Serial.print("Home Error:(");
  Serial.print(qErrHome1);Serial.print(" "); Serial.print(qErrHome2);Serial.print(" ");Serial.print(qErrHome3);Serial.print(" ");Serial.print(qErrHome4); 
-// Serial.print(")"); 
-Serial.print("    ");
+ Serial.print(")");
  
-// Serial.print("    ");Serial.print("Euler Error:(");
- Serial.print(eulX);Serial.print(" "); Serial.print(eulY);Serial.print(" ");Serial.print(eulZ);
-// Serial.print(" )");
-
-  Serial.print("    ");Serial.print(xPropOutput); Serial.print("    ");Serial.print(xDerivativeOutput); Serial.print("    ");Serial.print(xOutput);
-//  Serial.print("    ");Serial.print(xOutput); Serial.print("    ");Serial.print(yOutput); Serial.print("    ");Serial.print(zOutput);
-  Serial.println();
+ Serial.print("    ");Serial.print("Euler Error:(");
+ Serial.print(eulZ);Serial.print(" "); Serial.print(eulY);Serial.print(" ");Serial.print(eulX);
+ Serial.print(" )");
+ 
+ // Serial.print("    ");Serial.print(qLength);
+ Serial.println();
 }
 
 //==========================================================================
@@ -84,36 +82,27 @@ void filter(){
 //==========================================================================
 //This receives a trigger from the user via serial monitor to change the desired orientation (enter 1 into the serial monitor to trigger) 
 //==========================================================================
-void trigger() 
-{
-  if (Serial.available() > 0)
-  {
+void trigger() {
+  if (Serial.available() > 0){
     rx_byte = Serial.read();
-    switch(rx_byte)
-    {
-      case '1':
-        qRef1 = qMeas1;
-        qRef2 = qMeas2;
-        qRef3 = qMeas3;
-        qRef4 = qMeas4;
-        break;
-      case '0':
-        s=0;  
-        break; 
+
+    if ((rx_byte =='1')){
+      qRef1 = qMeas1;
+      qRef2 = qMeas2;
+      qRef3 = qMeas3;
+      qRef4 = qMeas4;
     }
   }
 }
-
-
 
 //==========================================================================
 //This converts the relative quaternion to euler angles
 //==========================================================================
 void euler(){
-eulZ=atan2(2.0*(qErrHome2*qErrHome3+qErrHome4*qErrHome1),(sq(qErrHome2)-sq(qErrHome3)-sq(qErrHome4)+sq(qErrHome1)));
+eulX=atan2(2.0*(qErrHome2*qErrHome3+qErrHome4*qErrHome1),(sq(qErrHome2)-sq(qErrHome3)-sq(qErrHome4)+sq(qErrHome1)));
 eulY=asin(-2.0*(qErrHome2*qErrHome4-qErrHome1*qErrHome3)/(sq(qErrHome2)+sq(qErrHome3)+sq(qErrHome4)+sq(qErrHome1)));
-eulX=atan2(2.0*(qErrHome3*qErrHome4+qErrHome1*qErrHome2),(-sq(qErrHome2)-sq(qErrHome3)+sq(qErrHome4)+sq(qErrHome1)));
-eulZ=eulZ*180/3.1415;
-eulY=eulY*180/3.1415;
+eulZ=atan2(2.0*(qErrHome3*qErrHome4+qErrHome1*qErrHome2),(-sq(qErrHome2)-sq(qErrHome3)+sq(qErrHome4)+sq(qErrHome1)));
 eulX=eulX*180/3.1415;
+eulY=eulY*180/3.1415;
+eulZ=eulZ*180/3.1415;
 }
